@@ -1,0 +1,618 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [1136, 720],
+      "id": "7c10d0a1-ae1c-4f09-a921-c06a17462a6b",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "AC6qDxlfvN76eReA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [1264, 720],
+      "id": "dd16eab7-5200-4132-9cae-9f7156f6b24c",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [1344, 928],
+      "id": "6aeb396c-f2e3-4be6-8549-eaf6d9522e63",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [688, 496],
+      "id": "2539a562-1934-4e45-a11d-d223fb9ec38d",
+      "name": "When clicking 'Test workflow'"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [1168, 496],
+      "id": "c898f46a-25a0-4884-9554-79fc64852517",
+      "name": "Add to Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FD4H94XhmR0z6VrX",
+          "name": "Supabase voice-ai-playground"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1xzv2JcRcrQUEhq49Qb4wZrTQ0Y0gRwbo",
+          "mode": "list",
+          "cachedResultName": "llm_applications_textbook.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1xzv2JcRcrQUEhq49Qb4wZrTQ0Y0gRwbo/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [912, 496],
+      "id": "9f382f6f-796a-4944-a33c-9ad79e82f73d",
+      "name": "Download File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hh8J4NGtlm06CbHd",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [896, -416],
+      "id": "48a8609f-595f-4d2a-b08b-68006bcd5353",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "AC6qDxlfvN76eReA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Listen').item.json.headers['x-session-id'] }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [1168, -432],
+      "id": "f76d224f-f009-4fb0-8fb1-ad96c0966818",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "7wB4vFS5EnFe66LW",
+          "name": "Book Companion Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "building_llm_from_scratch_tool",
+        "toolDescription": "Extracting chunks",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 3,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [1280, -256],
+      "id": "b1e4a13b-ba5f-4949-b852-09ccefdc73a5",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FD4H94XhmR0z6VrX",
+          "name": "Supabase voice-ai-playground"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.text}}",
+        "options": {
+          "systemMessage": "You are a friendly Book Companion for one book:  Building LLM from scratch by Hamza Farooq. \nGoal: answer questions, summarise, and clarify using ONLY content from this book.\n\nBehavior:\n1) Get the answer from \"Supabase Vector Store tool\"\n2) If you are unable to get a response then gracefully handle, if you get a response follow below instructions:\n-  Ground every answer in retrieved text; if uncertain, say “Not in book” or ask for context.\n- Default to brief, clear replies max 2 sentences\n- Stay on-book; refuse external facts and opinions.\n\nAnswer format:\n- Answer should not be more than 1 sentence\n- Direct answer\n- Minimal citations "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1136, -640],
+      "id": "b595c230-df8c-4c29-bc9a-1089372c9d1d",
+      "name": "RAG Agent",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [1312, -64],
+      "id": "3d85fe74-45ba-406d-a1af-af5549f0b0d2",
+      "name": "Embeddings",
+      "credentials": {
+        "openAiApi": {
+          "id": "AC6qDxlfvN76eReA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c3d70b35-35e0-46aa-bb0b-73bff3c09c07",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [320, -432],
+      "id": "49271a50-8dc3-43a7-998e-b2224604b087",
+      "name": "Listen",
+      "webhookId": "c3d70b35-35e0-46aa-bb0b-73bff3c09c07"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [2144, -432],
+      "id": "6448d1ce-0f6e-4917-b0d2-df654d0d2576",
+      "name": "Respond"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "voice": "fable",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1776, -432],
+      "id": "0c6e6000-4d77-4032-a506-f3c1cb3344b0",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "AC6qDxlfvN76eReA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "audio",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [624, -432],
+      "id": "18b342d2-67f0-4446-ae5a-366c3ecd1c09",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "AC6qDxlfvN76eReA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Document Processing Pipeline\n\n📁 **STEP 1: Document Ingestion**\n- Downloads LLM Applications PDF from Google Drive\n- Splits document into manageable chunks\n- Converts text to vector embeddings\n- Stores in Supabase vector database\n\n⚡ **How it works:**\n1. Manual trigger starts the process\n2. Document is downloaded as binary data\n3. Text splitter breaks it into chunks\n4. OpenAI creates embeddings for each chunk\n5. Everything gets stored in Supabase\n\n🔄 **Run this ONCE to populate your knowledge base**",
+        "height": 760,
+        "width": 1140
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-80, 352],
+      "typeVersion": 1,
+      "id": "a950feed-2a12-40a1-b9f1-06ddd47c8924",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "📥 **MANUAL TRIGGER**\n\nClick to start document processing!\n- One-time setup process\n- Prepares your knowledge base\n- Run this before chatting",
+        "height": 280,
+        "width": 200,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [448, 496],
+      "typeVersion": 1,
+      "id": "d36c5d5e-7e94-4c6f-87db-e316005907f5",
+      "name": "Manual Trigger Explanation"
+    },
+    {
+      "parameters": {
+        "content": "📂 **GOOGLE DRIVE DOWNLOAD**\n\nDownloads specific file:\n- Building LLM Applications PDF\n- Binary data format\n- Ready for processing",
+        "height": 140,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [752, 672],
+      "typeVersion": 1,
+      "id": "ba02e67d-2e47-452a-a401-9269f89a97cd",
+      "name": "Drive Explanation"
+    },
+    {
+      "parameters": {
+        "content": "💾 **VECTOR DATABASE INSERT**\n\nStores processed documents:\n- Embeddings + metadata\n- Supabase 'documents' table\n- Ready for retrieval\n- Searchable knowledge base",
+        "height": 200,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1488, 512],
+      "typeVersion": 1,
+      "id": "e44d19f3-490f-450a-a421-b0f1a6ec61ab",
+      "name": "Insert Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🔤 **EMBEDDINGS FOR STORAGE**\n\nConverts text chunks to vectors:\n- OpenAI embedding model\n- Numerical representations\n- Enables semantic search\n- Feeds into vector store",
+        "height": 280,
+        "width": 220,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [976, 880],
+      "typeVersion": 1,
+      "id": "c68fb91f-faa3-40ab-bb2b-b1dc4e4f6827",
+      "name": "Storage Embedding Explanation"
+    },
+    {
+      "parameters": {
+        "content": "📄 **DOCUMENT LOADER**\n\nProcesses binary files:\n- Extracts text from PDF\n- Handles various formats\n- Converts to readable text\n- Prepares for chunking\n\nData type: binary",
+        "height": 140,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1440, 832],
+      "typeVersion": 1,
+      "id": "ddee4da1-8fb7-4f13-ba9b-8540a521b6ce",
+      "name": "Loader Explanation"
+    },
+    {
+      "parameters": {
+        "content": "✂️ **TEXT SPLITTER**\n\nBreaks documents into chunks:\n- Recursive character splitting\n- Manageable piece sizes\n- Preserves context\n- Optimizes for embeddings\n\nFeeds into Document Loader",
+        "height": 140,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1456, 1088],
+      "typeVersion": 1,
+      "id": "055230ef-8702-4979-9af8-be171e7adfe2",
+      "name": "Splitter Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🔤 **EMBEDDING MODEL**\n\nConverts text to vectors for:\n- Semantic search\n- Similarity matching\n- Document retrieval\n- Vector comparisons\n\nUsed by vector store for search",
+        "height": 140,
+        "width": 220,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1264, 64],
+      "typeVersion": 1,
+      "id": "99bcd679-bb74-471f-89da-068dd14c6747",
+      "name": "Embedding Explanation"
+    },
+    {
+      "parameters": {
+        "content": "💾 **CONVERSATION MEMORY**\n\nPostgres database stores:\n- Chat history\n- User context\n- Previous Q&A pairs\n- Session continuity\n\nEnables natural conversations!",
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1024, -272],
+      "typeVersion": 1,
+      "id": "a7ac4970-d0de-4243-8972-fbd79b6d53a1",
+      "name": "Memory Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🔍 **VECTOR SEARCH TOOL**\n\nThis tool allows the agent to:\n- Search through document chunks\n- Find relevant information\n- Retrieve context for answers\n- Work with AWS knowledge base\n\nMode: retrieve-as-tool\nTool name: aws_knowledge_base",
+        "height": 232,
+        "width": 312,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1536, -256],
+      "typeVersion": 1,
+      "id": "3740fb79-11e8-4041-bf33-19427e5157a6",
+      "name": "Vector Tool Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🧠 **RAG AGENT - The Brain**\n\nThis is the core AI that:\n- Processes user questions\n- Decides when to search documents\n- Combines knowledge with reasoning\n- Maintains conversation flow",
+        "height": 184,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1088, -848],
+      "typeVersion": 1,
+      "id": "b0c9ea42-9078-435f-aedf-5d153a7d3975",
+      "name": "Agent Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🤖 **LANGUAGE MODEL**\n\nGPT-4o-mini provides:\n- Natural language understanding\n- Response generation\n- Reasoning capabilities\n- Cost-effective AI power",
+        "width": 220,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [768, -288],
+      "typeVersion": 1,
+      "id": "c7040fbd-b353-4edf-88bc-4aa4526ae2c8",
+      "name": "LLM Explanation"
+    },
+    {
+      "parameters": {
+        "content": "🎯 **LISTEN WEB-HOOK TRIGGER**\nThis is your main entry point!\n- Receives audio files via POST webhook\n- Extracts session ID from x-session-id headers\n- Passes audio to transcription pipeline\n- Webhook-based for real-time voice interactions",
+        "height": 196,
+        "width": 328,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [144, -608],
+      "typeVersion": 1,
+      "id": "b7388ba2-bb7a-4438-bc49-6a67437edd6a",
+      "name": "Trigger Explanation"
+    },
+    {
+      "parameters": {
+        "content": "# Book Companion -> Voice Agent RAG <- with Memory\n\n🎙️ **VOICE-TO-VOICE INTERFACE**\n- User sends audio → Transcription → RAG Agent → Audio response\n- Processes voice input via OpenAI Whisper transcription\n- Returns spoken answers using OpenAI text-to-speech (Fable voice)\n- Session-based conversations via x-session-id headers\n\n🤖 **RAG AGENT CORE**\n- OpenAI GPT-4o-mini processes transcribed questions\n- Retrieves content ONLY from \"Building LLM from Scratch\" book\n- Enforces strict book-only responses with graceful handling\n- Brief, direct answers (max 1-2 sentences)\n\n🧠 **Memory System:**\n- Postgres stores chat history with 20-message context window\n- Session-based memory using custom session keys\n- Enables natural, flowing voice conversations\n\n🔍 **Knowledge Retrieval:**\n- Supabase vector store with OpenAI text-embedding-3-large\n- Searches top 3 relevant book chunks per query\n- Tool-based retrieval specifically for building LLM content\n- Grounded responses - says \"Not in book\" when uncertain",
+        "height": 720,
+        "width": 1120,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-368, -736],
+      "typeVersion": 1,
+      "id": "d9d7d95f-dfa8-4f9d-8cc1-86af61b5c0fe",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "🎤 **AUDIO TRANSCRIPTION**\nConverts voice to text!\n- Uses OpenAI Whisper to transcribe audio input\n- Processes binary audio data from webhook\n- Outputs clean text for RAG Agent processing",
+        "height": 192,
+        "width": 272,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [560, -640],
+      "id": "1c363dde-9034-426a-a88c-3e1b354194f4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "🔊 **TEXT-TO-SPEECH**\nConverts responses to voice!\n- Uses OpenAI TTS with \"Fable\" voice\n- Takes RAG Agent text output as input\n- Returns audio binary for webhook response",
+        "height": 176,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1680, -624],
+      "id": "0a55c91c-decf-49e2-b7e5-cd5f76cebeb5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "📤 **AUDIO RESPONSE**\nSends voice back to user!\n- Returns generated audio as binary data\n- Completes the voice-to-voice loop\n- Final step in the conversation flow",
+        "height": 164,
+        "width": 312,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [2032, -608],
+      "typeVersion": 1,
+      "id": "6e922db2-9564-4069-a598-63e80041e5a8",
+      "name": "Trigger Explanation1"
+    }
+  ],
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listen": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52f3ea1091e7549d03d6d6af8d10ffb0eb258a70b8ac87a64741364349b14adc"
+  }
+}
